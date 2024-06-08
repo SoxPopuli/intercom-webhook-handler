@@ -1,8 +1,15 @@
 mod error;
+mod telemetry;
+mod utils;
 
 use anyhow::{bail, Result};
-use lambda_http::{run, service_fn, tracing, Body, Error, Request, RequestExt, Response};
-use opentelemetry_otlp::WithExportConfig;
+use lambda_http::{
+    run, service_fn,
+    tracing::{self},
+    Body, Error, Request, Response,
+};
+use telemetry::setup_telemetry;
+use utils::Pipe;
 
 /// This is the main body for the function.
 /// Write your code inside it.
@@ -25,20 +32,13 @@ async fn function_handler(event: Request) -> Result<Response<Body>> {
     Ok(resp)
 }
 
-fn setup_telemetry() {
-    let exporter_endpoint = 
-        std::env::var("OTEL_ENDPOINT")
-        .expect("OTEL_ENDPOINT not set");
-
-    let exporter = opentelemetry_otlp::new_exporter()
-        .tonic()
-        .with_endpoint(exporter_endpoint);
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-
-    tracing::init_default_subscriber();
+    let _telemetry = if std::env::var("DISABLE_TELEMETRY") != Ok("1".into()) {
+        setup_telemetry().await?.pipe(Some)
+    } else {
+        None
+    };
 
     run(service_fn(function_handler)).await
 }

@@ -20,7 +20,7 @@ aws-config = "1.5.1"
 aws-sdk-sqs = "1.29.1"
 lambda_http = "0.11.1"
 opentelemetry-otlp = { version = "0.16.0", features = ["metrics", "logs"] }
-opentelemetry_sdk = { version = "0.23.0", features = ["metrics", "logs"] }
+opentelemetry_sdk = { version = "0.23.0", features = ["metrics", "logs", "rt-tokio"] }
 opentelemetry = { version = "0.23.0", features = ["metrics", "logs"] }
 tokio = { version = "1", features = ["macros", "tracing"] }
 tracing-opentelemetry = "0.24.0"
