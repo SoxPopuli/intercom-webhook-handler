@@ -6,8 +6,6 @@ mod error;
 mod telemetry;
 mod utils;
 
-use std::sync::Arc;
-
 use anyhow::{bail, Result};
 use aws_lambda_events::sqs::SqsEvent;
 use aws_sdk_s3::Client as S3Client;
@@ -75,9 +73,9 @@ where
 async fn function_handler(event: LambdaEvent<SqsEvent>) -> Result<()> {
     let config = aws_config::load_defaults(aws_config::BehaviorVersion::v2024_03_28()).await;
 
-    let s3_client = aws_sdk_s3::Client::new(&config).pipe(Arc::new);
+    let s3_client = aws_sdk_s3::Client::new(&config);
 
-    let bucket_name = std::env::var("OUTPUT_BUCKET")?.pipe(Arc::new);
+    let bucket_name = std::env::var("OUTPUT_BUCKET")?;
 
     let records: Vec<_> = event
         .payload
