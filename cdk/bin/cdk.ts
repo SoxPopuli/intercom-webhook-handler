@@ -9,6 +9,5 @@ const env = {
   region: process.env.CDK_DEFAULT_REGION,
 };
 
-stack(app, "Stage", { env });
-
-stack(app, "Prod", { env });
+stack(app, `stage`, { env, apiEnv: "stage" });
+stack(app, `prod`, { env, apiEnv: "prod" });

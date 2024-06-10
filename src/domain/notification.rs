@@ -19,7 +19,7 @@ where
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Notification<T: DeserializeOwned> {
     #[serde(rename = "type")]
     pub typ: String,

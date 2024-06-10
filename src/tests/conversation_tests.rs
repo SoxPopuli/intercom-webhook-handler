@@ -1,4 +1,4 @@
-use super::{ s, dt };
+use super::{dt, s};
 use std::collections::HashMap;
 
 use crate::domain::{
@@ -67,17 +67,17 @@ fn conversation_deserialization_test() {
         Conversation {
             typ: s("conversation"),
             id: s("1295"),
-            title: Some(s("Conversation Title"),),
+            title: Some(s("Conversation Title")),
             created_at: dt("2022-09-19T14:20:23Z"),
             updated_at: dt("2022-09-19T14:21:00Z"),
-            waiting_since: Some(dt("2022-09-19T14:21:00Z"),),
-            snoozed_until: Some(dt("2022-09-19T14:21:00Z"),),
+            waiting_since: Some(dt("2022-09-19T14:21:00Z")),
+            snoozed_until: Some(dt("2022-09-19T14:21:00Z")),
             open: true,
             state: ConversationState::Open,
             read: true,
             priority: ConversationPriority::Priority,
-            admin_assignee_id: Some(0,),
-            team_assignee_id: Some(s("5017691"),),
+            admin_assignee_id: Some(0),
+            team_assignee_id: Some(s("5017691")),
             tags: vec![Tag {
                 typ: s("tag"),
                 id: s("123456"),
@@ -93,17 +93,17 @@ fn conversation_deserialization_test() {
                         typ: s("contact"),
                         id: s("5ba682d23d7cf92bef87bfd4"),
                     },
-                    external_id: Some(s("f3b87a2e09d514c6c2e79b9a"),),
+                    external_id: Some(s("f3b87a2e09d514c6c2e79b9a")),
                 },
                 teammate: Reference {
                     typ: s("contact"),
                     id: s("1a2b3c"),
                 },
-            },),
+            }),
             source: ConversationSource {
                 typ: s("conversation"),
                 id: s("3"),
-                delivered_as: s("operator_initiated"),
+                delivered_as: DeliveredAs::OperatorInitiated,
                 subject: s(""),
                 body: s("<p>Hey there!</p>"),
                 author: Author {
@@ -129,7 +129,7 @@ fn conversation_deserialization_test() {
                     typ: s("contact"),
                     id: s("5ba682d23d7cf92bef87bfd4"),
                 },
-                external_id: Some(s("f3b87a2e09d514c6c2e79b9a"),),
+                external_id: Some(s("f3b87a2e09d514c6c2e79b9a")),
             },],
             teammates: vec![],
             custom_attributes: [(s("property2"), s("string")), (s("property1"), s("string")),]
@@ -138,13 +138,13 @@ fn conversation_deserialization_test() {
             first_contact_reply: Some(FirstContactReply {
                 created_at: dt("2022-09-19T14:20:23Z"),
                 typ: s("conversation"),
-                url: Some(s("https://developers.intercom.com/"),),
-            },),
+                url: Some(s("https://developers.intercom.com/")),
+            }),
             sla_applied: Some(AppliedSLA {
                 typ: s("conversation_sla_summary"),
                 sla_name: s(""),
                 sla_status: SLAStatus::Hit,
-            },),
+            }),
             statistics: Some(Statistics {
                 typ: s("conversation_statistics"),
                 time_to_assignment: 2310,
@@ -165,12 +165,12 @@ fn conversation_deserialization_test() {
                 count_reopens: 1,
                 count_assignments: 1,
                 count_conversation_parts: 1,
-            },),
+            }),
             ai_agent_participated: true,
             ai_agent: AIAgent {
                 source_type: SourceType::Workflow,
-                source_title: Some(s("My AI Workflow"),),
-                last_answer_type: Some(LastAnswerType::AIAnswer,),
+                source_title: Some(s("My AI Workflow")),
+                last_answer_type: Some(LastAnswerType::AIAnswer),
                 resolution_state: ResolutionState::AssumedResolution,
                 rating: 4,
                 rating_remark: s("Very helpful!"),

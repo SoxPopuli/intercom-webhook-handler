@@ -1,8 +1,8 @@
+use super::DateTime;
 use chrono::serde::{ts_seconds, ts_seconds_option};
 use paste::paste;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
-use super::DateTime;
 
 /// Generate a function that extracts an array from an object with a type field
 /// and the array of name `$field`
@@ -18,8 +18,6 @@ macro_rules! impl_deserialize_from_wrapper {
                 {
                     #[derive(Deserialize)]
                     struct Wrapper {
-                        #[serde(rename = "type")]
-                        _typ: String,
                         $field: Vec<$typ>,
                     }
 
@@ -33,7 +31,7 @@ macro_rules! impl_deserialize_from_wrapper {
     };
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Tag {
     #[serde(rename = "type")]
     pub typ: String,
@@ -44,7 +42,7 @@ pub struct Tag {
 }
 impl_deserialize_from_wrapper!(Tag, tags);
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Reference {
     #[serde(rename = "type")]
     pub typ: String,
@@ -52,7 +50,7 @@ pub struct Reference {
 }
 impl_deserialize_from_wrapper!(Reference, teammates);
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct ContactReference {
     #[serde(flatten)]
     pub reference: Reference,
@@ -60,7 +58,7 @@ pub struct ContactReference {
 }
 impl_deserialize_from_wrapper!(ContactReference, contacts);
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ConversationState {
     Open,
@@ -68,14 +66,14 @@ pub enum ConversationState {
     Snoozed,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ConversationPriority {
     Priority,
     NotPriority,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct ConversationRating {
     pub rating: i8,
     pub remark: String,
@@ -85,7 +83,7 @@ pub struct ConversationRating {
     pub teammate: Reference,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Author {
     #[serde(rename = "type")]
     pub typ: String,
@@ -94,7 +92,7 @@ pub struct Author {
     pub email: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Attachment {
     #[serde(rename = "type")]
     pub typ: String,
@@ -106,21 +104,35 @@ pub struct Attachment {
     pub height: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum DeliveredAs {
+    CustomerInitiated,
+    CampaignsInitiated,
+    OperatorInitiated,
+    Automated,
+    AdminInitiated,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct ConversationSource {
     #[serde(rename = "type")]
     pub typ: String,
     pub id: String,
-    pub delivered_as: String,
+    pub delivered_as: DeliveredAs,
+    #[serde(skip_serializing)]
     pub subject: String,
+    #[serde(skip_serializing)]
     pub body: String,
+    #[serde(skip_serializing)]
     pub author: Author,
+    #[serde(skip_serializing)]
     pub attachments: Vec<Attachment>,
     pub url: Option<String>,
     pub redacted: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct FirstContactReply {
     #[serde(deserialize_with = "ts_seconds::deserialize")]
     pub created_at: DateTime,
@@ -129,7 +141,7 @@ pub struct FirstContactReply {
     pub url: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum SLAStatus {
     Hit,
@@ -138,7 +150,7 @@ pub enum SLAStatus {
     Active,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct AppliedSLA {
     #[serde(rename = "type")]
     pub typ: String,
@@ -146,7 +158,7 @@ pub struct AppliedSLA {
     pub sla_status: SLAStatus,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Statistics {
     #[serde(rename = "type")]
     pub typ: String,
@@ -179,7 +191,7 @@ pub struct Statistics {
     pub count_conversation_parts: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ContentType {
     File,
@@ -189,7 +201,7 @@ pub enum ContentType {
     WorkflowConnectorAction,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct ContentSources {
     pub content_type: ContentType,
     pub url: String,
@@ -198,7 +210,7 @@ pub struct ContentSources {
 }
 impl_deserialize_from_wrapper!(ContentSources, content_sources);
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceType {
     EssentialsPlanSetup,
@@ -208,7 +220,7 @@ pub enum SourceType {
     FinPreview,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum LastAnswerType {
     #[serde(rename = "ai_answer")]
@@ -216,7 +228,7 @@ pub enum LastAnswerType {
     CustomAnswer,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ResolutionState {
     AssumedResolution,
@@ -225,7 +237,7 @@ pub enum ResolutionState {
     Abandoned,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct AIAgent {
     pub source_type: SourceType,
     pub source_title: Option<String>,
@@ -233,12 +245,15 @@ pub struct AIAgent {
     pub resolution_state: ResolutionState,
     pub rating: u8,
     pub rating_remark: String,
-    #[serde(deserialize_with = "ContentSources::deserialize_from_content_sources_wrapper")]
+    #[serde(
+        deserialize_with = "ContentSources::deserialize_from_content_sources_wrapper",
+        skip_serializing
+    )]
     pub content_sources: Vec<ContentSources>,
 }
 
 /// [Type definition](https://developers.intercom.com/docs/references/rest-api/api.intercom.io/Conversations/conversation/)
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Conversation {
     #[serde(rename = "type")]
     pub typ: String,
