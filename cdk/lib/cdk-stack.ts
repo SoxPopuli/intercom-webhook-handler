@@ -4,19 +4,8 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { RustFunction } from "cargo-lambda-cdk";
 import { Architecture, LayerVersion } from "aws-cdk-lib/aws-lambda";
 
-import * as dotenv from "dotenv";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { ApiGatewayToSqs } from '@aws-solutions-constructs/aws-apigateway-sqs';
-
-dotenv.config({ path: "../.env" });
-
-export function tryLoadEnvVars(names: string[]): { [key: string]: string } {
-  const data = names
-    .map((name) => [name, process.env[name]])
-    .filter((x) => x[1] !== undefined);
-
-  return Object.fromEntries(data);
-}
 
 export function stack(scope: Construct, id: string, props: cdk.StackProps) {
   const stack = new cdk.Stack(scope, id, props);
