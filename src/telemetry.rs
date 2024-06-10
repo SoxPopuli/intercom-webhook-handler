@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use anyhow::Result;
 
-use lambda_http::tracing::{
+use lambda_runtime::tracing::{
     self,
     metadata::LevelFilter,
     subscriber::{layer::SubscriberExt, util::SubscriberInitExt},

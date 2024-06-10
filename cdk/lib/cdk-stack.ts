@@ -1,12 +1,12 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import * as sqs from "aws-cdk-lib/aws-sqs";
-import * as api from "aws-cdk-lib/aws-apigatewayv2";
-import * as integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import { RustFunction } from "cargo-lambda-cdk";
 import { Architecture, LayerVersion } from "aws-cdk-lib/aws-lambda";
 
 import * as dotenv from "dotenv";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { ApiGatewayToSqs } from '@aws-solutions-constructs/aws-apigateway-sqs';
 
 dotenv.config({ path: "../.env" });
 
@@ -21,7 +21,12 @@ export function tryLoadEnvVars(names: string[]): { [key: string]: string } {
 export function stack(scope: Construct, id: string, props: cdk.StackProps) {
   const stack = new cdk.Stack(scope, id, props);
 
-  const queue = new sqs.Queue(stack, "MessageQueue");
+  const bucket = new s3.Bucket(stack, "OutputBucket", {
+    bucketName: `intercom-webhook-handler-${id.toLowerCase()}-output-bucket`,
+    removalPolicy: cdk.RemovalPolicy.DESTROY,
+  })
+
+  const apiQueue = new ApiGatewayToSqs(stack, "InputQueue", { });
 
   const handler = new RustFunction(stack, `Handler`, {
     manifestPath: "../Cargo.toml",
@@ -29,10 +34,13 @@ export function stack(scope: Construct, id: string, props: cdk.StackProps) {
     bundling: {
       cargoLambdaFlags: ["--target", "aarch64-unknown-linux-musl"],
     },
+    events: [
+      new SqsEventSource(apiQueue.sqsQueue),
+    ],
     environment: {
       OTEL_ENDPOINT: "http://localhost:4317/v1/traces",
       DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT: "localhost:4317",
-      MESSAGE_QUEUE: queue.queueArn,
+      OUTPUT_BUCKET: bucket.bucketArn,
     },
     layers: [
       LayerVersion.fromLayerVersionArn(
@@ -43,14 +51,8 @@ export function stack(scope: Construct, id: string, props: cdk.StackProps) {
     ],
   });
 
-  queue.grantConsumeMessages(handler);
-
-  new api.HttpApi(stack, "Api", {
-    defaultIntegration: new integrations.HttpLambdaIntegration(
-      "ApiIntegration",
-      handler,
-    ),
-  });
+  apiQueue.sqsQueue.grantConsumeMessages(handler);
+  bucket.grantPut(handler);
 
   return stack;
 }

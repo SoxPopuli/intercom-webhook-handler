@@ -21,6 +21,7 @@
     "typescript": "~5.4.5"
   },
   "dependencies": {
+    "@aws-solutions-constructs/aws-apigateway-sqs": "^2.59.0",
     "aws-cdk-lib": "2.144.0",
     "cargo-lambda-cdk": "^0.0.22",
     "constructs": "^10.0.0",
